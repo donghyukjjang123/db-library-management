@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "./App.css";
 
 function App() {
   const [books, setBooks] = useState([]);
@@ -63,7 +64,7 @@ function App() {
 
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="container">
       <h1>📚 Library Management System</h1>
 
       <h2>도서 목록</h2>
@@ -84,7 +85,9 @@ function App() {
               <td>{book.book_id}</td>
               <td>{book.title}</td>
               <td>{book.author}</td>
-              <td>{book.available ? "가능" : "대출중"}</td>
+              <td className={book.available ? "available" : "borrowed"}>
+                {book.available ? "가능" : "대출중"}
+              </td>
               <td>
                 {book.available && (
                   <button
@@ -118,7 +121,9 @@ function App() {
               <td>{loan.loan_id}</td>
               <td>{loan.user_name}</td>
               <td>{loan.book_title}</td>
-              <td>{loan.status}</td>
+              <td className={loan.status === "RETURNED" ? "returned" : "borrowed"}>
+                {loan.status}
+              </td>
               <td>{new Date(loan.loan_date).toLocaleString()}</td>
               <td>
                 {loan.status === "BORROWED" && (
