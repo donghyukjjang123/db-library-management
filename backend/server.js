@@ -188,6 +188,26 @@ app.put("/loans/:id/return", async (req, res) => {
 
 const PORT = 3000;
 
+app.get("/books/search/:keyword", async (req, res) => {
+    const keyword = req.params.keyword;
+
+    try {
+        const result = await pool.query(
+            `SELECT *
+             FROM books
+             WHERE title ILIKE $1
+             ORDER BY book_id`,
+            [`%${keyword}%`]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "검색 실패" });
+    }
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
@@ -207,24 +227,5 @@ app.post("/books", async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "도서 추가 실패" });
-    }
-});
-
-app.get("/books/search/:keyword", async (req, res) => {
-    const keyword = req.params.keyword;
-
-    try {
-        const result = await pool.query(
-            `SELECT *
-             FROM books
-             WHERE title ILIKE $1
-             ORDER BY book_id`,
-            [`%${keyword}%`]
-        );
-
-        res.json(result.rows);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "검색 실패" });
     }
 });
