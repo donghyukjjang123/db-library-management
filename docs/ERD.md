@@ -1,3 +1,6 @@
+## ERD
+
+```mermaid
 erDiagram
     USERS ||--o{ LOANS : borrows
     BOOKS ||--o{ LOANS : loaned
@@ -6,6 +9,7 @@ erDiagram
         int user_id PK
         varchar name
         varchar email
+        timestamp created_at
     }
 
     BOOKS {
@@ -14,6 +18,7 @@ erDiagram
         varchar author
         varchar publisher
         boolean available
+        timestamp created_at
     }
 
     LOANS {
@@ -24,3 +29,4 @@ erDiagram
         timestamp return_date
         varchar status
     }
+```
