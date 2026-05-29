@@ -28,6 +28,15 @@ app.get("/books", async (req, res) => {
     }
 });
 
+app.get("/users", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM users ORDER BY user_id");
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Database error" });
+    }
+});
 
 app.get("/loans", async (req, res) => {
     try {
@@ -52,6 +61,33 @@ app.get("/loans", async (req, res) => {
     }
 });
 
+app.get("/users/:id/loans", async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const result = await pool.query(
+            `SELECT
+                loans.loan_id,
+                users.name AS user_name,
+                books.title AS book_title,
+                loans.loan_date,
+                loans.status
+             FROM loans
+             JOIN users ON loans.user_id = users.user_id
+             JOIN books ON loans.book_id = books.book_id
+             WHERE users.user_id = $1
+               AND loans.status = 'BORROWED'
+             ORDER BY loans.loan_date DESC`,
+            [userId]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
 app.post("/loans", async (req, res) => {
     const { user_id, book_id } = req.body;
     const client = await pool.connect();
@@ -65,7 +101,21 @@ app.post("/loans", async (req, res) => {
             throw new Error("Book not found");
         }
         if (bookResult.rows[0].available === false) {
-            throw new Error("Book is already borrowed");
+            throw new Error("이미 대출 중인 도서입니다.");
+        }
+
+        const countResult = await client.query(
+            `SELECT COUNT(*) AS borrowed_count
+            FROM loans
+            WHERE user_id = $1
+            AND status = 'BORROWED'`,
+            [user_id]
+        );
+
+        const borrowedCount = Number(countResult.rows[0].borrowed_count);
+
+        if (borrowedCount >= 2) {
+            throw new Error("회원당 최대 2권까지 대출할 수 있습니다.");
         }
         const loanResult = await client.query(
             `INSERT INTO loans (user_id, book_id, status)
@@ -142,3 +192,39 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
+app.post("/books", async (req, res) => {
+    const { title, author, publisher } = req.body;
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO books (title, author, publisher)
+             VALUES ($1, $2, $3)
+             RETURNING *`,
+            [title, author, publisher]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "도서 추가 실패" });
+    }
+});
+
+app.get("/books/search/:keyword", async (req, res) => {
+    const keyword = req.params.keyword;
+
+    try {
+        const result = await pool.query(
+            `SELECT *
+             FROM books
+             WHERE title ILIKE $1
+             ORDER BY book_id`,
+            [`%${keyword}%`]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "검색 실패" });
+    }
+});
