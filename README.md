@@ -61,9 +61,39 @@ PostgreSQL을 활용한 도서 대출 관리 웹 서비스입니다.
 
 ## ERD
 
-mermaid erDiagram     USERS ||--o{ LOANS : borrows     BOOKS ||--o{ LOANS : loaned      USERS {         int user_id PK         varchar name         varchar email     }      BOOKS {         int book_id PK         varchar title         varchar author         varchar publisher         boolean available     }      LOANS {         int loan_id PK         int user_id FK         int book_id FK         timestamp loan_date         timestamp return_date         varchar status     } 
+```text
+USERS (1)
+   |
+   | user_id
+   |
+   v
+LOANS (N)
+   ^
+   |
+   | book_id
+   |
+BOOKS (1)
 
----
+USERS
+- user_id (PK)
+- name
+- email
+
+BOOKS
+- book_id (PK)
+- title
+- author
+- publisher
+- available
+
+LOANS
+- loan_id (PK)
+- user_id (FK)
+- book_id (FK)
+- loan_date
+- return_date
+- status
+```
 
 ## 주요 기능
 
