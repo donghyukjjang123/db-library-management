@@ -246,7 +246,3 @@ docker compose up --build
 - REST API 개발
 - Docker 기반 컨테이너 환경 구축
 - 웹 서비스와 DBMS 연동 과정 이해
-```
-:::
-
-이 버전이면 교수님이 README만 봐도 **Docker 사용**, **Relation**, **Query**, **Transaction**, **웹 서비스-DBMS 연동**이 전부 드러나서 지금보다 훨씬 완성도 높아 보여.
