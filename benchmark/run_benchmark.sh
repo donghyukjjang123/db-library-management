@@ -11,7 +11,7 @@ docker exec library_postgres psql \
 
 echo "===== Benchmark Start ====="
 
-echo "10 Clients Test"
+echo "10 Clients Transaction Test"
 docker exec library_postgres pgbench \
 -U hyuk \
 -d library_db \
@@ -22,7 +22,7 @@ docker exec library_postgres pgbench \
 -T 30 \
 > benchmark/result_10.txt
 
-echo "50 Clients Test"
+echo "50 Clients Transaction Test"
 docker exec library_postgres pgbench \
 -U hyuk \
 -d library_db \
@@ -33,7 +33,7 @@ docker exec library_postgres pgbench \
 -T 30 \
 > benchmark/result_50.txt
 
-echo "100 Clients Test"
+echo "100 Clients Transaction Test"
 docker exec library_postgres pgbench \
 -U hyuk \
 -d library_db \
