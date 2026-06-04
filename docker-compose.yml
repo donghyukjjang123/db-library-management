@@ -1,0 +1,45 @@
+services:
+  database:
+    image: postgres:18
+    container_name: library_postgres
+    environment:
+      POSTGRES_USER: hyuk
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: library_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1_schema.sql
+      - ./database/sample_data.sql:/docker-entrypoint-initdb.d/2_sample_data.sql
+    networks:
+      - library-network
+
+  backend:
+    build: ./backend
+    container_name: library_backend
+    ports:
+      - "3000:3000"
+    environment:
+      DB_USER: hyuk
+      DB_PASSWORD: 1234
+      DB_NAME: library_db
+      DB_HOST: database
+      DB_PORT: 5432
+    depends_on:
+      - database
+    networks:
+      - library-network
+
+  frontend:
+    build: ./frontend
+    container_name: library_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - library-network
+
+networks:
+  library-network:
+    driver: bridge

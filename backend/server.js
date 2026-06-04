@@ -8,10 +8,11 @@ app.use(cors());
 app.use(express.json());
 
 const pool = new Pool({
-    user: "hyuk",
-    host: "localhost",
-    database: "library_db",
-    port: 5432
+    user: process.env.DB_USER || "hyuk",
+    host: process.env.DB_HOST || "localhost",
+    database: process.env.DB_NAME || "library_db",
+    password: process.env.DB_PASSWORD || "",
+    port: process.env.DB_PORT || 5432
 });
 
 app.get("/", (req, res) => {
