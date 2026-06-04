@@ -1,0 +1,13 @@
+pgbench (18.4 (Debian 18.4-1.pgdg13+1))
+transaction type: /benchmark/loan_query.sql
+scaling factor: 1
+query mode: simple
+number of clients: 50
+number of threads: 4
+maximum number of tries: 1
+duration: 30 s
+number of transactions actually processed: 36753
+number of failed transactions: 0 (0.000%)
+latency average = 40.837 ms
+initial connection time = 15.415 ms
+tps = 1224.370357 (without initial connection time)

@@ -236,6 +236,80 @@ docker compose up --build
 
 ---
 
+## Benchmark
+
+### Benchmark Environment
+
+- PostgreSQL 18
+- Docker Container Environment
+- Benchmark Tool: pgbench
+- Test Duration: 30 seconds
+- Threads: 4
+
+### Test Query
+
+회원별 대출 현황 조회 Query를 대상으로 성능을 측정하였다.
+
+```sql
+SELECT
+    users.name,
+    books.title,
+    loans.loan_date,
+    loans.status
+FROM loans
+JOIN users ON loans.user_id = users.user_id
+JOIN books ON loans.book_id = books.book_id
+WHERE loans.status = 'BORROWED';
+```
+
+### Large Dataset Generation
+
+벤치마크를 위해 추가 데이터를 생성하였다.
+
+- Users: 500명 추가
+- Books: 1000권 추가
+- Loans: 10000건 추가
+
+### Benchmark Execution
+
+```bash
+./benchmark/run_benchmark.sh
+```
+
+실행 시 다음 테스트가 자동으로 수행된다.
+
+- 10 Clients
+- 50 Clients
+- 100 Clients
+
+결과는 다음 파일에 저장된다.
+
+```text
+benchmark/result_10.txt
+benchmark/result_50.txt
+benchmark/result_100.txt
+```
+
+### Benchmark Results
+
+| Clients | TPS | Average Latency (ms) |
+|----------|----------:|----------:|
+| 10 | 728.04 | 13.74 |
+| 50 | 1224.37 | 40.84 |
+| 100 | 1023.93 | 97.66 |
+
+### Result Analysis
+
+벤치마크 결과, 동시 접속자 수가 증가함에 따라 TPS는 증가하였으며 50명의 클라이언트 환경에서 가장 높은 처리량(1224.37 TPS)을 기록하였다.
+
+100명의 클라이언트 환경에서는 평균 지연 시간(Latency)이 크게 증가하였고, TPS는 오히려 감소하였다. 이는 데이터베이스가 동시에 처리해야 하는 요청 수가 증가하면서 시스템 자원 경쟁이 발생하였기 때문으로 분석된다.
+
+또한 모든 테스트에서 실패한 트랜잭션이 발생하지 않아 데이터 무결성이 유지됨을 확인할 수 있었다.
+
+이를 통해 PostgreSQL이 다수의 동시 요청을 안정적으로 처리할 수 있음을 확인하였으며, 과도한 동시 접속 환경에서는 지연 시간이 증가할 수 있음을 확인하였다.
+
+---
+
 ## 학습 내용
 
 본 프로젝트를 통해 다음 내용을 학습하였다.
